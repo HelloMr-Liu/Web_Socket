@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title></title>
+    <style>
+    </style>
+
+    <!--  引入对应的 layui、element-ui、mian(自定义样式) 的css样式 -->
+    <link th:href="@{/css/layui.css}" rel="stylesheet">
+    <!-- <link th:href="@{/css/main.css}" rel="stylesheet">-->
+    <link th:href="@{/css/element-ui.css}" rel="stylesheet">
+</head>
+
+
+<body >
+    <!--<h3>WebSocket测试，在<span style="color:red">控制台</span>查看测试信息输出！</h3>-->
+    <!-- <h4>
+        [url=http://localhost:8090/zhengqi/WebSocket/sendOne?message=单发消息内容&id=none]单发消息链接[/url]
+        [url=http://localhost:8090/zhengqi/WebSocket/sendAll?message=群发消息内容]群发消息链接[/url]
+    </h4>-->
+    <div id="app">
+       <!-- 创建一个栅格布局容器-->
+        <div class="layui-container">
+            <!--创建一行容器-->
+            <div class="layui-row" style="margin-bottom: 20px;margin-top: 20px;margin-left: 1rem">
+                <div class="layui-col-md2 layui-col-md-offset1" style="">
+                    <button type="button" class="layui-btn layui-btn-sm layui-btn-normal"  onclick="buildSocket(this)"><i class="layui-icon"></i>建立连接</button>
+                </div>
+            </div>
+            <!--创建一行容器-->
+            <div class="layui-row">
+                <el-card shadow="always">
+                    <form class="layui-form" action="#">
+                        <div class="layui-col-md4">
+                            <div class="layui-form-item layui-form-text ">
+                                <label class="layui-form-label">消息输入</label>
+                                <div class="layui-input-block">
+                                    <textarea placeholder="请输入内容" name="content" class="layui-textarea"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-col-md3">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">用户ID</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="id" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button type="submit" class="layui-btn" lay-submit="" lay-filter="submitDemo1">发送消息</button>
+                                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                            </div>
+                        </div>
+                    </form>
+                </el-card>
+            </div>
+
+            <el-card shadow="always" style="margin-top: 20px">
+                <div class="layui-row">
+                    <div class="layui-col-md10 layui-col-md-offset1" >
+                        <!--<button class="layui-btn layui-btn-sm" lay-event="getCheckData" disabled="true" id="memberId">用户ID：</button>-->
+                        <button class="layui-btn layui-btn-sm" lay-event="getCheckData" disabled="true" id="onlineMember">在线人数：</button>
+                    </div>
+                </div>
+
+                <!--创建第三行容器-->
+                <div class="layui-row">
+                    <div class="layui-col-md10 layui-col-md-offset1" >
+                            <el-table
+                                    :data="tableData"
+                                    border
+                                    style="width: 100%">
+                                <el-table-column
+                                        prop="id"
+                                        label="用户ID"
+                                        width="500%">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="time"
+                                        label="在线时间"
+                                        >
+                                </el-table-column>
+                            </el-table>
+                        </div>
+                </div>
+                <!--创建第四行容器-->
+                <div class="layui-row" style="margin-top: 20px">
+                    <div class="layui-col-md10 layui-col-md-offset1" >
+                        <template>
+                            <el-table
+                                    :data="getMessageData"
+                                    style="width: 100%"
+                                    border
+                                    :default-sort = "{prop: 'time', order: 'descending'}"
+                            >
+                                <el-table-column
+                                        prop="time"
+                                        label="发送时间"
+                                        sortable
+                                        width="180">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="id"
+                                        label="用户ID"
+                                        sortable
+                                        width="180">
+                                </el-table-column>
+                                <el-table-column
+                                        prop="content"
+                                        label="内容"
+                                >
+                                </el-table-column>
+                            </el-table>
+                        </template>
+                    </div>
+                </div>
+            </el-card>
+        </div>
+    </div>
+</body>
+
+
+<!-- 引入组件库 -->
+<script th:src="@{/js/jquery-1.9.1.min.js}"></script>
+<script th:src="@{/js/vue.min.js}"></script>
+<script th:src="@{/js/element-ui.js}"></script>
+<!--采用非模块化方式layUi js -->
+<script th:src="@{/layui.all.js}"></script>
+<!--<script th:src="@{/js/main.js}"></script>-->
+
+
+<script>
+
+
+</script>
+
+
+<script type="text/javascript">
+    var baseUrl="[[@{/}]]";
+    var socket;
+    var app = new Vue({
+        el: "#app",
+        data: {
+            tableData:[],
+            getMessageData:[]
+        }
+
+    });
+
+    //获取在线人员
+    function getOnlineMember() {
+
+    }
+    //监听提交
+    layui.form.on('submit(submitDemo1)', function(data){
+        socket.send(JSON.stringify(data.field))
+    });
+
+    //建立Web Socket连接
+    function  buildSocket(obj) {
+        if (typeof (WebSocket) == "undefined") {
+            console.log("遗憾：您的浏览器不支持WebSocket");
+        } else {
+            //实现化WebSocket对象
+            //指定要连接的服务器地址与端口建立连接
+            //ws对应http、wss对应https。
+            //socket = new WebSocket("ws://localhost:8090"+baseUrl+"myWebSocket/test");
+            socket = new WebSocket("ws://localhost:9090/liuzijiangSocket");
+
+            //连接成功后会调用该方法
+            socket.onopen = function() {
+                console.log("Socket 已打开");
+                $(obj).attr('disabled',true);  //按钮建立socket按钮不能点击了
+                $(obj).html("<i class=\"layui-icon\"></i>"+"连接中。。。");  //按钮建立socket按钮不能点击了
+                //发送消息给后端信息上
+                socket.send("GET_MEMBER_ONLINE");
+                layer.msg('恭喜：您的浏览器支持WebSocket',{type: 1,shade: 0.4,time:1000})
+            };
+
+            //当后端对指定的客户端进行了消息推送就会执行当前onmessage方法，会将推送的信息给接受
+            socket.onmessage = function(msg) {
+                var currDataObject=JSON.parse(msg.data);
+                console.log(currDataObject.numberOnline+"1231231231231231");
+                if(typeof(currDataObject.numberOnline)!= undefined){
+                    //更新在线人数
+                    $("#onlineMember").text("在线人数："+currDataObject.numberOnline);
+                    //当前用户ID
+                    $("#memberId").text("用户ID："+currDataObject.currMemberId);
+                    app.tableData=currDataObject.onlineMemberList;
+                }else{
+                    console.log(JSON.stringify(app.getMessageData))
+                    app.getMessageData.push(currDataObject);
+                }
+            };
+
+            //连接关闭事件
+            socket.onclose = function() {
+                console.log("Socket已关闭");
+            };
+            //发生了错误事件
+            socket.onerror = function() {
+                alert("Socket发生了错误");
+            }
+
+            //窗口关闭时，关闭连接
+            window.unload=function() {
+                socket.close();
+            };
+
+        }
+    }
+
+
+
+
+</script>
+
+</html>
