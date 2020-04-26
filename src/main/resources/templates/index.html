@@ -170,7 +170,8 @@
             //指定要连接的服务器地址与端口建立连接
             //ws对应http、wss对应https。
             //socket = new WebSocket("ws://localhost:8090"+baseUrl+"myWebSocket/test");
-            socket = new WebSocket("ws://localhost:9090/liuzijiangSocket");
+            //socket = new WebSocket("ws://localhost:9090/liuzijiangSocket");
+            socket = new WebSocket("ws://localhost:8888/myWebSocket");
 
             //连接成功后会调用该方法
             socket.onopen = function() {
