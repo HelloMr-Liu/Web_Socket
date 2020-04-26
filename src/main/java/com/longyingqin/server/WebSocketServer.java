@@ -35,7 +35,6 @@ public class WebSocketServer {
     //它是线程安全的无序的集合，可以将它理解成线程安全的HashSet
     private static CopyOnWriteArraySet<Session> SessionSet = new CopyOnWriteArraySet<Session>();
 
-
     @PostConstruct
     public void init() {
         System.out.println("当前web通讯服务已经加载");
@@ -92,7 +91,6 @@ public class WebSocketServer {
             }
         }
     }
-
 
     //指定Session发送消息
     public static void SendMessage(String message,String sessionId) throws IOException {

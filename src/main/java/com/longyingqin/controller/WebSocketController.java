@@ -18,7 +18,6 @@ import java.io.IOException;
 @RequestMapping("/WebSocket")
 public class WebSocketController {
 
-
     @RequestMapping("/showWebSocketHtml")
     public String showWebSocketHtml(){
         return "index";
